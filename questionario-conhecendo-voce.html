@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Questionário Conhecendo Você</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: uma coluna estreita sobre papel quadriculado de caderno de física; cada bloco é uma "folha" numerada na ordem de resposta */
+:root{color-scheme:light;
+  --bg:#f3f6fb; --grid:#dfe7f3; --paper:#ffffff; --ink:#16213a; --muted:#5b6880;
+  --line:#d3dbe8; --accent:#2747d6; --accent-ink:#ffffff; --mark:#ffe066; --ok:#1f8a5b;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1424; --grid:#18213a; --paper:#151d33; --ink:#e8edf8; --muted:#9aa7c2;
+  --line:#2a3656; --accent:#7f97ff; --accent-ink:#0e1424; --mark:#6b5a12; --ok:#4cc38a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1424; --grid:#18213a; --paper:#151d33; --ink:#e8edf8; --muted:#9aa7c2;
+  --line:#2a3656; --accent:#7f97ff; --accent-ink:#0e1424; --mark:#6b5a12; --ok:#4cc38a; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px}
+.wrap{max-width:640px;margin:0 auto;padding:28px 16px 64px;display:grid;gap:18px}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,8vw,44px);line-height:1.05;margin:0;text-wrap:balance}
+header h1 mark{background:linear-gradient(transparent 55%,var(--mark) 55%);color:inherit;padding:0 2px}
+header p{color:var(--muted);margin:10px 0 0;max-width:60ch}
+.eyebrow{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:8px}
+.progress{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--bg);padding-block:8px;display:grid;gap:6px}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.progress small{color:var(--muted);font-variant-numeric:tabular-nums}
+fieldset{border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:18px 16px 20px;margin:0;display:grid;gap:12px;min-width:0}
+legend{font-family:var(--display);font-weight:600;font-size:20px;padding:0 6px;display:flex;gap:8px;align-items:baseline}
+legend .n{font-size:14px;color:var(--accent);font-variant-numeric:tabular-nums}
+.hint{color:var(--muted);font-size:15px;margin:-4px 0 0}
+label.q{font-weight:700;display:block;margin-bottom:6px}
+input[type=text],textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+textarea{min-height:76px;resize:vertical}
+input:focus-visible,textarea:focus-visible,select:focus-visible,.chip input:focus-visible+span,.scale input:focus-visible+span{outline:3px solid var(--accent);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip input,.scale input{position:absolute;opacity:0;pointer-events:none}
+.chip span{display:inline-block;padding:8px 14px;border:1px solid var(--line);border-radius:99px;cursor:pointer;background:var(--bg);user-select:none}
+.chip input:checked+span{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.chip{position:relative}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.scale label{position:relative}
+.scale span{display:grid;place-items:center;height:46px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-weight:700;background:var(--bg);font-variant-numeric:tabular-nums}
+.scale input:checked+span{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.ends{display:flex;justify-content:space-between;font-size:14px;color:var(--muted)}
+.field{display:grid;gap:4px}
+button{font:inherit;font-weight:700;border-radius:12px;padding:14px 18px;border:0;cursor:pointer}
+.primary{background:var(--accent);color:var(--accent-ink);font-size:18px}
+.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+#out{display:grid;gap:12px}
+#summary{white-space:pre-wrap;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:14px;font-size:15px;max-height:340px;overflow:auto}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.done{color:var(--ok);font-weight:700}
+.err{color:#c0392b;font-weight:700}
+@media (prefers-reduced-motion:reduce){.bar span{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Física com o Prof. João Victor</div>
+    <h1>Antes da primeira aula, quero <mark>te conhecer</mark></h1>
+    <p>Minhas aulas são montadas a partir do que você curte. Se você gosta de jogo, a gente aprende jogando; se gosta de vídeo, esporte ou experimento, a física vem por aí. Não existe resposta certa. Leva uns 5 minutos.</p>
+  </header>
+
+  <div class="progress" aria-live="polite"><div class="bar"><span id="barfill"></span></div><small id="count">0 de 12 respondidas</small></div>
+
+  <form id="f" novalidate>
+    <div style="display:grid;gap:18px">
+
+    <fieldset><legend><span class="n">1</span>Quem é você</legend>
+      <div class="field"><label class="q" for="nome">Como você gosta de ser chamado?</label><input type="text" id="nome" name="nome" autocomplete="given-name"></div>
+      <div class="field"><label class="q" for="serie">Série e escola</label><input type="text" id="serie" name="serie" placeholder="Ex.: 1ª série, Escola Estadual..."></div>
+    </fieldset>
+
+    <fieldset><legend><span class="n">2</span>O que você curte</legend>
+      <p class="hint">Marque quantos quiser.</p>
+      <div class="chips" data-name="interesses">
+        <label class="chip"><input type="checkbox" id="i1" value="Games"><span>Games</span></label>
+        <label class="chip"><input type="checkbox" id="i2" value="Vídeos e YouTube"><span>Vídeos e YouTube</span></label>
+        <label class="chip"><input type="checkbox" id="i3" value="Esportes e atividade física"><span>Esportes</span></label>
+        <label class="chip"><input type="checkbox" id="i4" value="Experimentos e mão na massa"><span>Experimentos</span></label>
+        <label class="chip"><input type="checkbox" id="i5" value="Música"><span>Música</span></label>
+        <label class="chip"><input type="checkbox" id="i6" value="Tecnologia e programação"><span>Tecnologia</span></label>
+        <label class="chip"><input type="checkbox" id="i7" value="Desenho e arte"><span>Desenho e arte</span></label>
+        <label class="chip"><input type="checkbox" id="i8" value="Filmes, séries e animes"><span>Filmes, séries, animes</span></label>
+        <label class="chip"><input type="checkbox" id="i9" value="Carros e motos"><span>Carros e motos</span></label>
+        <label class="chip"><input type="checkbox" id="i10" value="Espaço e astronomia"><span>Espaço</span></label>
+        <label class="chip"><input type="checkbox" id="i11" value="Leitura"><span>Leitura</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset><legend><span class="n">3</span>Seus favoritos</legend>
+      <div class="field"><label class="q" for="fav">Qual jogo, canal, esporte, série ou artista você mais curte agora?</label><textarea id="fav" name="fav" placeholder="Ex.: Minecraft, futebol, o canal tal..."></textarea></div>
+    </fieldset>
+
+    <fieldset><legend><span class="n">4</span>Como você aprende melhor</legend>
+      <p class="hint">Marque quantos quiser.</p>
+      <div class="chips" data-name="aprende">
+        <label class="chip"><input type="checkbox" id="a1" value="Vendo vídeos e animações"><span>Vendo vídeos</span></label>
+        <label class="chip"><input type="checkbox" id="a2" value="Fazendo e testando"><span>Fazendo e testando</span></label>
+        <label class="chip"><input type="checkbox" id="a3" value="Resolvendo desafios"><span>Resolvendo desafios</span></label>
+        <label class="chip"><input type="checkbox" id="a4" value="Conversando e explicando"><span>Conversando</span></label>
+        <label class="chip"><input type="checkbox" id="a5" value="Lendo e fazendo resumos"><span>Lendo e resumindo</span></label>
+        <label class="chip"><input type="checkbox" id="a6" value="Jogando e competindo"><span>Jogando e competindo</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset><legend><span class="n">5</span>Você e a física</legend>
+      <span class="q" id="lf">Quanto você gosta de física hoje?</span>
+      <div class="scale" role="radiogroup" aria-labelledby="lf">
+        <label><input type="radio" name="fisica" id="f1" value="1"><span>1</span></label>
+        <label><input type="radio" name="fisica" id="f2" value="2"><span>2</span></label>
+        <label><input type="radio" name="fisica" id="f3" value="3"><span>3</span></label>
+        <label><input type="radio" name="fisica" id="f4" value="4"><span>4</span></label>
+        <label><input type="radio" name="fisica" id="f5" value="5"><span>5</span></label>
+      </div>
+      <div class="ends"><span>Nada</span><span>Amo</span></div>
+    </fieldset>
+
+    <fieldset><legend><span class="n">6</span>Você e a matemática</legend>
+      <span class="q" id="lm">Quanto você se sente seguro em matemática?</span>
+      <div class="scale" role="radiogroup" aria-labelledby="lm">
+        <label><input type="radio" name="mat" id="m1" value="1"><span>1</span></label>
+        <label><input type="radio" name="mat" id="m2" value="2"><span>2</span></label>
+        <label><input type="radio" name="mat" id="m3" value="3"><span>3</span></label>
+        <label><input type="radio" name="mat" id="m4" value="4"><span>4</span></label>
+        <label><input type="radio" name="mat" id="m5" value="5"><span>5</span></label>
+      </div>
+      <div class="ends"><span>Pouco</span><span>Muito</span></div>
+      <div class="field"><label class="q" for="dif">Tem algum assunto que você acha difícil ou chato?</label><input type="text" id="dif" name="dif"></div>
+    </fieldset>
+
+    <fieldset><legend><span class="n">7</span>Seu objetivo</legend>
+      <div class="chips" data-name="objetivo">
+        <label class="chip"><input type="checkbox" id="o1" value="Melhorar as notas"><span>Melhorar as notas</span></label>
+        <label class="chip"><input type="checkbox" id="o2" value="ENEM ou vestibular"><span>ENEM ou vestibular</span></label>
+        <label class="chip"><input type="checkbox" id="o3" value="Olimpíadas de física ou matemática"><span>Olimpíadas</span></label>
+        <label class="chip"><input type="checkbox" id="o4" value="Curiosidade, quero entender o mundo"><span>Curiosidade</span></label>
+        <label class="chip"><input type="checkbox" id="o5" value="Futura profissão"><span>Futura profissão</span></label>
+      </div>
+      <div class="field"><label class="q" for="prof">Já pensa em alguma profissão?</label><input type="text" id="prof" name="prof"></div>
+    </fieldset>
+
+    <fieldset><legend><span class="n">8</span>O jeito de aula que combina com você</legend>
+      <div class="chips" data-name="estilo">
+        <label class="chip"><input type="checkbox" id="e1" value="Ritmo rápido, muitos desafios"><span>Ritmo rápido</span></label>
+        <label class="chip"><input type="checkbox" id="e2" value="Ritmo calmo, com tempo para pensar"><span>Ritmo calmo</span></label>
+        <label class="chip"><input type="checkbox" id="e3" value="Gosta de competir"><span>Gosto de competir</span></label>
+        <label class="chip"><input type="checkbox" id="e4" value="Prefere conversar e perguntar"><span>Gosto de perguntar</span></label>
+        <label class="chip"><input type="checkbox" id="e5" value="Prefere ver exemplos do dia a dia"><span>Exemplos do dia a dia</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset><legend><span class="n">9</span>Sua rotina</legend>
+      <div class="field"><label class="q" for="disp">Em que você vai assistir às aulas?</label>
+        <select id="disp" name="disp"><option value="">Escolha</option><option>Celular</option><option>Computador ou notebook</option><option>Tablet</option><option>Tablet com caneta</option></select></div>
+      <div class="field"><label class="q" for="tempo">Quanto tempo por semana você consegue estudar fora da aula?</label>
+        <select id="tempo" name="tempo"><option value="">Escolha</option><option>Menos de 1 hora</option><option>De 1 a 3 horas</option><option>De 3 a 5 horas</option><option>Mais de 5 horas</option></select></div>
+    </fieldset>
+
+    <fieldset><legend><span class="n">10</span>Foco e conforto</legend>
+      <div class="field"><label class="q" for="foco">O que te ajuda a manter o foco? E o que atrapalha?</label><textarea id="foco" name="foco"></textarea></div>
+      <div class="field"><label class="q" for="adapt">Precisa de alguma adaptação? (letra maior, mais tempo, pausas, legendas...)</label><input type="text" id="adapt" name="adapt"></div>
+    </fieldset>
+
+    <fieldset><legend><span class="n">11</span>A pergunta que não sai da sua cabeça</legend>
+      <div class="field"><label class="q" for="curio">Qual coisa sobre o mundo ou o universo você sempre quis entender?</label><textarea id="curio" name="curio" placeholder="Ex.: por que o avião não cai? como funciona um buraco negro?"></textarea></div>
+    </fieldset>
+
+    <fieldset><legend><span class="n">12</span>Algo mais</legend>
+      <div class="field"><label class="q" for="extra">Quer me contar mais alguma coisa sobre você?</label><textarea id="extra" name="extra"></textarea></div>
+    </fieldset>
+
+    <button type="submit" class="primary">Terminar e gerar minhas respostas</button>
+    </div>
+  </form>
+
+  <fieldset id="out" hidden><legend>Pronto! Agora envie para o professor</legend>
+    <p class="hint">Toque em copiar e cole numa mensagem para o Prof. João Victor no WhatsApp ou no chat da aula.</p>
+    <div id="summary"></div>
+    <div class="row">
+      <button type="button" class="primary" id="copy">Copiar respostas</button>
+      <a class="ghost" id="wa" target="_blank" rel="noopener" style="display:inline-block;padding:14px 18px;border-radius:12px;text-decoration:none;font-weight:700">Abrir no WhatsApp</a>
+      <button type="button" class="ghost" id="edit">Editar respostas</button>
+    </div>
+    <p id="msg" aria-live="polite"></p>
+  </fieldset>
+</div>
+
+<script>
+(function(){
+  const f=document.getElementById('f'), KEY='questionario-aluno-v1';
+  const groups=[['nome','serie'],['interesses'],['fav'],['aprende'],['fisica'],['mat'],['objetivo','prof'],['estilo'],['disp','tempo'],['foco','adapt'],['curio'],['extra']];
+  function checks(n){return [...document.querySelectorAll('[data-name="'+n+'"] input:checked')].map(i=>i.value)}
+  function val(n){
+    if(document.querySelector('[data-name="'+n+'"]')) return checks(n).join(', ');
+    const r=f.querySelector('input[name="'+n+'"]:checked'); if(r) return r.value;
+    const e=document.getElementById(n); return e&&e.type!=='radio'?e.value.trim():'';
+  }
+  function progress(){
+    const done=groups.filter(g=>g.some(n=>val(n))).length;
+    document.getElementById('barfill').style.width=(done/12*100)+'%';
+    document.getElementById('count').textContent=done+' de 12 respondidas';
+  }
+  function save(){
+    const s={}; f.querySelectorAll('input,textarea,select').forEach(el=>{s[el.id]=(el.type==='checkbox'||el.type==='radio')?el.checked:el.value});
+    try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}
+  }
+  try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s) Object.entries(s).forEach(([id,v])=>{const el=document.getElementById(id); if(!el)return; if(el.type==='checkbox'||el.type==='radio') el.checked=v; else el.value=v;})}catch(e){}
+  f.addEventListener('input',()=>{progress();save()}); f.addEventListener('change',()=>{progress();save()});
+  progress();
+
+  function line(t,v){return t+': '+(v||'(não respondeu)')}
+  f.addEventListener('submit',ev=>{
+    ev.preventDefault();
+    const txt=['QUESTIONÁRIO DO ALUNO',
+      line('Nome',val('nome')), line('Série e escola',val('serie')),
+      line('Interesses',val('interesses')), line('Favoritos',val('fav')),
+      line('Aprende melhor',val('aprende')),
+      line('Gosta de física (1 a 5)',val('fisica')), line('Segurança em matemática (1 a 5)',val('mat')),
+      line('Acha difícil ou chato',val('dif')), line('Objetivos',val('objetivo')), line('Profissão em mente',val('prof')),
+      line('Estilo de aula',val('estilo')), line('Dispositivo',val('disp')), line('Tempo de estudo por semana',val('tempo')),
+      line('Foco',val('foco')), line('Adaptações',val('adapt')),
+      line('Curiosidade',val('curio')), line('Algo mais',val('extra'))].join('\n');
+    document.getElementById('summary').textContent=txt;
+    document.getElementById('wa').href='https://wa.me/?text='+encodeURIComponent(txt);
+    document.getElementById('msg').textContent='';
+    f.hidden=true; document.getElementById('out').hidden=false; window.scrollTo(0,0);
+  });
+  document.getElementById('edit').onclick=()=>{f.hidden=false;document.getElementById('out').hidden=true};
+  document.getElementById('copy').onclick=()=>{
+    const t=document.getElementById('summary').textContent, m=document.getElementById('msg');
+    const fallback=()=>{const r=document.createRange();r.selectNodeContents(document.getElementById('summary'));const s=getSelection();s.removeAllRanges();s.addRange(r);m.className='';m.textContent='O texto ficou selecionado. Use o copiar do seu aparelho.'};
+    try{navigator.clipboard.writeText(t).then(()=>{m.className='done';m.textContent='Copiado! Agora é só colar na mensagem para o professor.'},fallback)}catch(e){fallback()}
+  };
+})();
+</script>
+</body>
+</html>
